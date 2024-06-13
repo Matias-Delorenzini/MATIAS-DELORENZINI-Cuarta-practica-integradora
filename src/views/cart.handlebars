@@ -1,0 +1,75 @@
+<ul>
+    <li><a href="/api/products">Productos</a></li>
+    <li>🛒</li>
+    <li><a href="/profile">Mi perfil</a></li>
+</ul>
+
+{{#if productsData}}
+<ul>
+    {{#each productsData}}
+        <li>
+            {{product.title}} Stock: {{product.stock}} - Cantidad: {{quantity}}
+            <button onclick="removeProduct('{{product._id}}')"> Eliminar producto </button>
+            <p style="display: none;">{{product._id}}</p>
+            <form action="/api/cart" method="post" id="quantityForm">
+                <input type="hidden" name="productId" id="productId" value="{{product._id}}">
+                <label for="quantity">Cantidad a añadir:</label>
+                <input type="number" id="quantity" name="quantityToAdd" required>
+                <input type="submit" value="Añadir Cantidad">
+            </form>
+        </li>
+    {{/each}}
+</ul>
+<button onclick="clearCart()">Vaciar Carrito</button>
+<button onclick="purchase()">Confirmar Compra</button>
+
+<p>Recibirás un email con tu confirmación de compra</p>
+
+{{else}}
+    <p>El carrito está vacío.</p>
+{{/if}}
+
+<script>
+
+    async function clearCart() {
+        try {
+            const response = await fetch(`/api/cart/clear`, {
+                method: 'DELETE'
+            });
+            } catch (error) {
+                console.error('Error al realizar la solicitud para vaciar el carrito:', error);
+            } finally {
+                window.location.href = "/api/cart";
+        }
+    }
+
+
+    async function removeProduct(productId) {
+        try {
+            const response = await fetch(`/api/cart/removeProduct/${productId}`, {
+                method: 'DELETE',
+            });
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Error al realizar la solicitud para eliminar el producto:', error);
+        } finally {
+            window.location.href = "/api/cart";
+        }
+    }
+
+
+    async function purchase() {
+        try {
+            const response = await fetch(`/api/cart/purchase`, {
+                method: 'POST'
+            });
+            } catch (error) {
+                console.error('Error al realizar la solicitud para vaciar el carrito:', error);
+            } finally {
+                window.location.href = "/api/cart";
+        }
+    }
+
+</script>

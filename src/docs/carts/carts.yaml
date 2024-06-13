@@ -1,0 +1,427 @@
+openapi: 3.1.0
+info:
+  title: "Documentación del ecommerce de Matías Delorenzini"
+  description: "API pensada para la entrega de la clase 39, que documenta los módulos de productos y carritos."
+  version: "1.0.0"
+paths:
+  /api/cart/addToCart:
+    put:
+      summary: Añade un producto al carrito del usuario.
+      tags:
+        - Carts
+      parameters:
+        - name: productId
+          in: query
+          required: true
+          description: ID del producto a añadir al carrito.
+          schema:
+            type: string
+      responses:
+        200:
+          description: Producto añadido al carrito con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Producto añadido al carrito con éxito"
+        400:
+          description: Error de validación o datos de entrada incorrectos.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "CART_PRODUCT_ADD_MISSING_ARGUMENTS"
+                  message:
+                    type: object
+                    example: "No se pudo añadir el producto al carrito porque el id del producto o el carrito no fueron especificados."
+        403:
+          description: No puedes añadir tu propio producto al carrito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "No puedes añadir tu propio producto al carrito"
+        500:
+          description: Error al añadir el producto al carrito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "CART_PRODUCT_ADD_ERROR"
+                  message:
+                    type: string
+                    example: "Error interno del servidor al añadir el producto al carrito."
+  
+  /api/cart:
+    get:
+      summary: Obtiene el carrito del usuario.
+      tags:
+        - Carts
+      responses:
+        200:
+          description: Solicitud exitosa. Retorna los productos en el carrito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  productsData:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+        404:
+          description: Carrito no encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "CART_NOT_FOUND"
+                  message:
+                    type: string
+                    example: "No se encontró el carrito especificado."
+        500:
+          description: Error al obtener el carrito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "CART_DATA_ERROR"
+                  message:
+                    type: string
+                    example: "Error interno del servidor al obtener los datos del carrito."
+    post:
+      summary: Aumenta la cantidad de un producto en el carrito.
+      tags:
+        - Carts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productId:
+                  type: string
+                quantityToAdd:
+                  type: integer
+              required:
+                - productId
+                - quantityToAdd
+      responses:
+        200:
+          description: Cantidad de producto aumentada con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Cantidad de producto aumentada con éxito"
+        400:
+          description: Error de validación o datos de entrada incorrectos.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "PRODUCT_QUANTITY_INCREASE_INVALID_QUANTITY"
+                  message:
+                    type: string
+                    example: "La cantidad a añadir debe ser un número positivo al aumentar la cantidad del producto."
+        404:
+          description: Carrito o producto no encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "CART_NOT_FOUND"
+                  message:
+                    type: string
+                    example: "No se encontró el carrito especificado."
+        500:
+          description: Error al aumentar la cantidad del producto.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "PRODUCT_QUANTITY_INCREASE_INVALID_QUANTITY"
+                  message:
+                    type: string
+                    example: "La cantidad a añadir debe ser un número positivo al aumentar la cantidad del producto."
+
+  /api/cart/clear:
+    delete:
+      summary: Limpia el carrito del usuario.
+      tags:
+        - Carts
+      responses:
+        200:
+          description: Carrito limpiado con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Carrito limpiado con éxito"
+        404:
+          description: Carrito no encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "CART_CLEAR_CART_NOT_FOUND"
+                  message:
+                    type: string
+                    example: "No se pudo vaciar el carrito ya que no se encontró."
+        500:
+          description: Error al limpiar el carrito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "CART_CLEAR_ERROR"
+                  message:
+                    type: string
+                    example: "Error interno del servidor al vaciar el carrito."
+
+  /api/cart/removeProduct/{productId}:
+    delete:
+      summary: Elimina un producto del carrito del usuario.
+      tags:
+        - Carts
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: ID del producto a eliminar del carrito.
+          schema:
+            type: string
+      responses:
+        200:
+          description: Producto eliminado del carrito con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Producto eliminado del carrito con éxito"
+        400:
+          description: Error de validación o datos de entrada incorrectos.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "CART_PRODUCT_DELETE_MISSING_ARGUMENTS"
+                  message:
+                    type: string
+                    example: "No se pudo eliminar el producto del carrito porque no se especificó el id del carrito o del producto."
+        404:
+          description: Carrito o producto no encontrados.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "CART_PRODUCT_DELETE_NOT_FOUND"
+                  message:
+                    type: string
+                    example: "No se pudo eliminar el producto del carrito porque no se especificó el id del carrito o del producto."
+        500:
+          description: Error al eliminar el producto del carrito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "CART_PRODUCT_DELETE_ERROR"
+                  message:
+                    type: string
+                    example: "Error interno del servidor al eliminar producto del carrito."
+
+  /api/cart/purchase:
+    post:
+      summary: Realiza la compra de los productos en el carrito.
+      tags:
+        - Carts
+      responses:
+        200:
+          description: Compra realizada con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Compra realizada con éxito"
+        404:
+          description: Carrito no encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "CART_NOT_FOUND"
+                  message:
+                    type: string
+                    example: "No se encontró el carrito especificado."
+        500:
+          description: Error al realizar la compra.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "error"
+                  error:
+                    type: string
+                    example: "Detalles del error del servidor"
+
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Id autogenerado de mongo
+        title:
+          type: string
+          description: Título del producto
+        description:
+          type: string
+          description: Descripción breve del producto
+        price:
+          type: number
+          format: float
+          description: Precio del producto
+        stock:
+          type: number
+          description: Stock del producto, que varía al ser comprado
+        category:
+          type: string
+          description: Categoría del producto, usada para agruparlos por tipo
+        owner:
+          type: string
+          description: Email del usuario que creó el producto. Si no es especificado se setea como el email del administrador del environment actual
+      example:
+        _id: 60c72b2f5f1b2c001c8e4b8d
+        title: "Laptop"
+        description: "Una laptop potente con 16GB de RAM y 512GB SSD."
+        price: 1999.99
+        stock: 30
+        category: "Electronics"
+        owner: "user@example.com"
+
+    Cart:
+      type: object
+      properties:
+        cartId:
+          type: string
+          description: ID del carrito
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              product:
+                $ref: '#/components/schemas/Product'
+              quantity:
+                type: integer
+                description: Cantidad del producto en el carrito
+      example:
+        cartId: "60d21b4667d0d8992e610c85"
+        products:
+          - product:
+              _id: 60c72b2f5f1b2c001c8e4b8d
+              title: "Laptop"
+              description: "Una laptop potente con 16GB de RAM y 512GB SSD."
+              price: 1999.99
+              stock: 30
+              category: "Electronics"
+              owner: "user@example.com"
+            quantity: 2
+
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Id autogenerado de mongo
+        first_name:
+          type: string
+          description: Nombre del usuario
+        last_name:
+          type: string
+          description: Apellido del usuario
+        email:
+          type: string
+          description: Email del usuario
+        age:
+          type: integer
+          description: Edad del usuario
+        password:
+          type: string
+          description: Contraseña del usuario
+        cart:
+          type: string
+          description: ID del carrito del usuario
+        role:
+          type: string
+          description: Rol del usuario
+      example:
+        first_name: "Matías"
+        last_name: "Delorenzini"
+        email: "user@example.com"
+        age: 30
+        password: "encrypted_password"
+        cart: "60d21b4667d0d8992e610c85"
+        role: "premium"

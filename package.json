@@ -1,0 +1,41 @@
+{
+  "name": "clase_44",
+  "version": "1.0.0",
+  "main": "app.js",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "test:cart": "mocha test/cart.test.js",
+    "test:products": "mocha test/products.test.js",
+    "test:sessions": "mocha test/sessions.test.js"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^8.4.1",
+    "bcrypt": "^5.1.1",
+    "commander": "^12.1.0",
+    "connect-mongo": "^5.1.0",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-handlebars": "^7.1.2",
+    "express-session": "^1.18.0",
+    "handlebars": "^4.7.8",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.4.1",
+    "mongoose-paginate-v2": "^1.8.2",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.13",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "random-unique-id": "^2.1.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "winston": "^3.13.0"
+  },
+  "devDependencies": {
+    "chai": "^5.1.1",
+    "mocha": "^10.4.0",
+    "nodemon": "^3.1.2",
+    "supertest": "^7.0.0"
+  }
+}

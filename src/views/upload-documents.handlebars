@@ -1,0 +1,16 @@
+<h2>Carga tus datos de usuario para procesar tu solicitud de cuenta premuim</h2>
+<form action="/api/users/{{user.email}}/documents" method="post" enctype="multipart/form-data">
+    <label for="identificacion">Identificación:</label><br>
+    <input type="file" name="identificacion" id="identificacion" accept="application/pdf"/> 
+    <br><br>
+
+    <label for="comprobante_de_domicilio">Comprobante de domicilio:</label><br>
+    <input type="file" name="comprobante_de_domicilio" id="comprobante_de_domicilio" accept="application/pdf"/> 
+    <br><br>
+
+    <label for="comprobante_de_estado_de_cuenta">Comprobante de estado de cuenta:</label><br>
+    <input type="file" name="comprobante_de_estado_de_cuenta" id="comprobante_de_estado_de_cuenta" accept="application/pdf"/> 
+    <br><br>
+    
+    <button type="submit">Subir documentos</button>
+</form>

@@ -1,0 +1,80 @@
+<ul>
+    <li>Productos</li>
+    <li><a href="/api/cart">🛒</a></li>
+    <li><a href="/profile">Mi perfil</a></li>
+</ul>
+
+<h2>¡Bienvenido, {{userData.first_name}} {{userData.last_name}}!</h2>
+<h2>Eres un {{userData.role}}</h2>
+
+<ul>
+    <li><a href="/api/products?sort=asc">Menor a mayor</a></li>
+    <li><a href="/api/products?sort=desc">Mayor a menor</a></li>
+    <li><a href="/api/products?stock">Solo con stock</a></li>
+    <li><p>Para buscar por categoría usar ?query=(nombre de la categoría) en la URL. Hay 6 productos con categoría "ropa" y 3 con "casa". Para probar la función usar este link:</p> <br> 
+    <a href="/api/products?query=casa">Categoría casa</a></li>
+</ul>
+
+<br>
+
+{{#if this.result.isValid}}
+
+<div>
+    {{#if this.result.hasPrevPage}}
+        <a href={{this.result.prevLink}}>⬅</a>
+    {{/if}}
+    &nbsp;
+    {{this.result.page}}
+    &nbsp;
+     {{#if this.result.hasNextPage}}
+        <a href={{this.result.nextLink}}>➡</a>
+    {{/if}} 
+</div>
+
+<br>
+
+<div>
+    {{#each this.result.docs}}
+    <div class="product">
+        <p>{{this.title}} &nbsp; Descripción: {{this.description}}</p>
+        <p>Precio: $ {{this.price}} &nbsp; Stock: {{this.stock}}</p>
+        <p>Categoría: {{this.category}}</p>
+        <p>{{this._id}}</p>
+        
+        {{#if userData.isAdmin}}
+            <h3>🛠 Controles de edición de productos</h3>
+        {{else}}
+            <button class="addBtn" dataProductId="{{this._id}}">+</button>
+        {{/if}}
+    </div>
+    <br/>
+{{/each}}
+</div>
+<br/>
+
+
+{{else}}
+<h1>No hay productos para mostrar</h1>
+{{/if}}
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const addBtns = document.querySelectorAll('.addBtn');
+
+    addBtns.forEach(addBtn => {
+        addBtn.addEventListener('click', async () => {
+            const productId = addBtn.getAttribute('dataProductId');
+
+            fetch(`/api/cart/addToCart?productId=${productId}`, {
+                method: 'PUT',
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(error => console.error('Error al añadir producto al carrito:', error));
+        });
+    });
+});
+
+</script>

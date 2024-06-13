@@ -1,0 +1,389 @@
+openapi: 3.1.0
+info:
+  title: "Documentación del ecommerce de Matías Delorenzini"
+  description: "API pensada para la entrega de la clase 39, que documenta los módulos de productos y carritos."
+  version: "1.0.0"
+paths:
+  /api/products/:
+    get:
+      summary: Obtiene todos los productos, aplicando la librería paginate de Mongoose para generar controles de paginación interactivos y dinámicos.
+      tags:
+        - Products
+      responses:
+        200:
+          description: Solicitud exitosa. Retorna una lista de productos con información de paginación.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  docs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: "60c72b2f5f1b2c001c8e4b8d"
+                        title:
+                          type: string
+                          example: "Producto de Ejemplo"
+                        description:
+                          type: string
+                          example: "Descripción del producto de ejemplo"
+                        price:
+                          type: number
+                          format: float
+                          example: 99.99
+                        stock:
+                          type: integer
+                          example: 10
+                        category:
+                          type: string
+                          example: "categoría de ejemplo"
+                        owner:
+                          type: string
+                          example: "owner@example.com"
+                  totalDocs:
+                    type: integer
+                    description: Número total de documentos.
+                    example: 11
+                  limit:
+                    type: integer
+                    description: Número de documentos por página.
+                    example: 5
+                  totalPages:
+                    type: integer
+                    description: Número total de páginas.
+                    example: 3
+                  page:
+                    type: integer
+                    description: Página actual.
+                    example: 1
+                  pagingCounter:
+                    type: integer
+                    description: Contador de paginación.
+                    example: 1
+                  hasPrevPage:
+                    type: boolean
+                    description: Indica si hay una página previa.
+                    example: false
+                  hasNextPage:
+                    type: boolean
+                    description: Indica si hay una página siguiente.
+                    example: true
+                  prevPage:
+                    type: integer
+                    nullable: true
+                    description: Número de la página previa.
+                    example: null
+                  nextPage:
+                    type: integer
+                    nullable: true
+                    description: Número de la siguiente página.
+                    example: 2
+                  prevLink:
+                    type: string
+                    description: Enlace a la página previa.
+                    example: ''
+                  nextLink:
+                    type: string
+                    description: Enlace a la siguiente página.
+                    example: '/api/products?page=2'
+                  isValid:
+                    type: boolean
+                    description: Indica si la página solicitada es válida.
+                    example: true
+                  userData:
+                    type: object
+                    description: Datos del usuario.
+                    properties:
+                      first_name:
+                        type: string
+                        example: "Nombre"
+                      last_name:
+                        type: string
+                        example: "Apellido"
+                      age:
+                        type: integer
+                        example: 25
+                      email:
+                        type: string
+                        example: "usuario@example.com"
+                      cart:
+                        type: string
+                        example: "usuario@example.com_cart"
+                      role:
+                        type: string
+                        example: "premium"
+                      isAdmin:
+                        type: boolean
+                        example: false
+        500:
+          description: Error al obtener los productos.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  error:
+                    type: string
+                    example: "Error al obtener los productos: [Detalles del error]"
+
+    post:
+      summary: Crea un nuevo producto.
+      tags:
+        - Products
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "Laptop"
+                description:
+                  type: string
+                  example: "Una laptop potente con 16GB de RAM y 512GB SSD."
+                price:
+                  type: number
+                  format: float
+                  example: 1200.99
+                stock:
+                  type: integer
+                  example: 30
+                category:
+                  type: string
+                  example: "Electronics"
+              required:
+                - title
+                - description
+                - price
+                - stock
+                - category
+      responses:
+        200:
+          description: Producto creado exitosamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Product'
+        400:
+          description: Error de validación o datos de entrada incorrectos.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "PRODUCT_CREATE_MISSING_ARGUMENTS"
+                  message:
+                    type: string
+                    example: "No se pudo crear el producto ya que no se proporcionaron uno o más datos."
+        403:
+          description: Prohibido. El usuario no tiene permisos para realizar esta acción.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Forbidden"
+        500:
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "PRODUCT_CREATE_ERROR"
+                  message:
+                    type: string
+                    example: "Error interno del servidor al crear el producto."
+
+  /api/products/create-product:
+    get:
+      summary: Solo un premium o admin puede acceder. Renderiza un formulario para crear un nuevo producto.
+      tags:
+        - Products
+      responses:
+        200:
+          description: Solicitud exitosa. Renderiza un formulario para crear un nuevo producto.
+          content:
+            text/html:
+              schema:
+                type: string
+                example: 
+                  <html>
+                    <h1>Create a New Product</h1>
+                    <form action="/api/products" method="post">
+                      <label for="title">Title:</label>
+                      <input type="text" id="title" name="title" required>
+                      <br><br>
+
+                      <label for="description">Description:</label>
+                      <textarea id="description" name="description" required></textarea>
+                      <br><br>
+
+                      <label for="price">Price:</label>
+                      <input type="number" id="price" name="price" required step="0.01">
+                      <br><br>
+
+                      <label for="stock">Stock:</label>
+                      <input type="number" id="stock" name="stock" required>
+                      <br><br>
+
+                      <label for="category">Category:</label>
+                      <input type="text" id="category" name="category" required>
+                      <br><br>
+
+                      <button type="submit">Create Product</button>
+                    </form>
+                  </html>
+        403:
+          description: Acceso denegado a la vista de creación de producto.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Forbidden"
+        500:
+          description: Error al mostrar la vista de creación de producto.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "error"
+                  error:
+                    type: string
+                    example: "Detalles del error del servidor"
+
+  /api/products/delete-product/{id}:
+    get:
+      summary: Solo un premium o admin puede acceder. Elimina un producto por ID.
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del producto a eliminar
+          schema:
+            type: string
+      responses:
+        200:
+          description: Producto eliminado exitosamente.
+          content:
+            text/html:
+              schema:
+                type: string
+                example: |
+                  <html>
+                    <body>
+                      <center><h3>Se ha eliminado el producto</h3></center>
+                    </body>
+                  </html>
+        400:
+          description: Error de validación o datos de entrada incorrectos.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "PRODUCT_DELETE_MISSING_ARGUMENTS"
+                  message:
+                    type: string
+                    example: "No se pudo eliminar el producto ya que no se proporcionó un id."
+        403:
+          description: Acceso denegado o no autorizado para eliminar el producto.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Forbidden"
+        404:
+          description: Producto no encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "PRODUCT_DELETE_NOT_FOUND"
+                  message:
+                    type: string
+                    example: "No se encontró el producto a eliminar."
+        500:
+          description: Error al eliminar el producto.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "PRODUCT_DELETE_ERROR"
+                  message:
+                    type: string
+                    example: "Error interno del servidor al eliminar el producto."
+
+          
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Id autogenerado de mongo
+        title:
+          type: string
+          description: Título del producto
+        description:
+          type: string
+          description: Descripción breve del producto
+        price:
+          type: number
+          format: float
+          description: Precio del producto
+        stock:
+          type: number
+          description: Stock del producto, que varía al ser comprado
+        category:
+          type: string
+          description: Categoría del producto, usada para agruparlos por tipo
+        owner:
+          type: string
+          description: Email del usuario que creó el producto. Si no es especificado se setea como el email del administrador del environment actual
+      example:
+        _id: 60c72b2f5f1b2c001c8e4b8d
+        title: "Laptop"
+        description: "Una laptop potente con 16GB de RAM y 512GB SSD."
+        price: 1999.99
+        stock: 30
+        category: "Electronics"
+        owner: "user@example.com"
